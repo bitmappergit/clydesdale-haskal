@@ -14,7 +14,7 @@
 (defmacro define-mumble-function (name &rest stuff)
   `(progn
      ;; CLisp's compiler is horribly broken about this...
-     #-clisp (eval-when (eval compile load) (export (list ',name) "MUMBLE"))
+     #-clisp (eval-when (:compile-toplevel :load-toplevel :execute) (export (list ',name) "MUMBLE"))
      #+clisp (export ',(list name) "MUMBLE")
      (defun ,name ,@stuff)))
 
@@ -25,7 +25,7 @@
 (defmacro define-mumble-function-inline (name &rest stuff)
   `(progn
      ;; CLisp's compiler is horribly broken about this...
-     #-clisp (eval-when (eval compile load) (export (list ',name) "MUMBLE"))
+     #-clisp (eval-when (:compile-toplevel :load-toplevel :execute) (export (list ',name) "MUMBLE"))
      #+clisp (export ',(list name) "MUMBLE")
 #+lcl
      (lcl:defsubst ,name ,@stuff)
@@ -41,7 +41,7 @@
 (defmacro define-mumble-macro (name &rest stuff)
   `(progn
      ;; CLisp's compiler is horribly broken about this...
-     #-clisp (eval-when (eval compile load) (export (list ',name) "MUMBLE"))
+     #-clisp (eval-when (:compile-toplevel :load-toplevel :execute) (export (list ',name) "MUMBLE"))
      #+clisp (export ',(list name) "MUMBLE")
      (defmacro ,name ,@stuff)))
 
@@ -53,9 +53,9 @@
 (defmacro define-mumble-import (name)
   `(progn
      ;; CLisp's compiler is horribly broken about this...
-     #-clisp (eval-when (eval compile load) (import (list ',name) "MUMBLE"))
+     #-clisp (eval-when (:compile-toplevel :load-toplevel :execute) (import (list ',name) "MUMBLE"))
      #+clisp (import ',(list name) "MUMBLE")
-     #-clisp (eval-when (eval compile load) (export (list ',name) "MUMBLE"))
+     #-clisp (eval-when (:compile-toplevel :load-toplevel :execute) (export (list ',name) "MUMBLE"))
      #+clisp (export ',(list name) "MUMBLE")
      ',name))
 
@@ -67,7 +67,7 @@
 (defmacro define-mumble-synonym (name cl-name)
   `(progn
      ;; CLisp's compiler is horribly broken about this...
-     #-clisp (eval-when (eval compile load) (export (list ',name) "MUMBLE"))
+     #-clisp (eval-when (:compile-toplevel :load-toplevel :execute) (export (list ',name) "MUMBLE"))
      #+clisp (export ',(list name) "MUMBLE")
      (setf (symbol-function ',name) (symbol-function ',cl-name))
 #+lcl
@@ -89,7 +89,7 @@
 (defmacro define-mumble-type (name &rest stuff)
   `(progn
      ;; CLisp's compiler is horribly broken about this...
-     #-clisp (eval-when (eval compile load) (export (list ',name) "MUMBLE"))
+     #-clisp (eval-when (:compile-toplevel :load-toplevel :execute) (export (list ',name) "MUMBLE"))
      #+clisp (export ',(list name) "MUMBLE")
      (deftype ,name ,@stuff)))
 

@@ -148,7 +148,7 @@
 ;;; Support for bit slots
 ;;;=====================================================================
 
-(eval-when (eval compile load)
+(eval-when (:compile-toplevel :load-toplevel :execute)
   (defconstant max-bits (integer-length most-positive-fixnum)))
 
 (defvar *bit-slot-getters* (make-array max-bits))
@@ -382,7 +382,7 @@
   (multiple-value-bind (include type-template slots prefix predicate)
       (parse-struct-fields name fields)
     `(progn
-       (eval-when (eval compile load)
+       (eval-when (:compile-toplevel :load-toplevel :execute)
 	 (install-struct-type
 	   ',name
 	   ',include

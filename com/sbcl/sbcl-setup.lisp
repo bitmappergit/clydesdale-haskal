@@ -6,20 +6,25 @@
 ;;; Since the Mac doesn't have a shell, this file contains some stuff to
 ;;; do basic system-building of the Yale Haskell system under MCL.
 
+(in-package #:cl-user)
+
+(setf *compile-print* t)
+(setf *compile-verbose* t)
 
 ;;; MCL implements CLtL2 rather than CLtL1.  However, we still have a
 ;;; few references to the LISP package around in our code.
 
-(if (not (find-package "LISP"))
-    (defpackage "LISP" (:use :cl)))
+(unless (find-package "LISP")
+  (defpackage "LISP"
+    (:use :cl)))
 
 
 ;;; Create the mumble-implementation package.  It's important to do this
 ;;; explicitly, because MCL's make-package defaults include extra junk that
 ;;; we don't want to have accessible.
 
-(if (not (find-package "MUMBLE-IMPLEMENTATION"))
-    (make-package "MUMBLE-IMPLEMENTATION" :use '("CL")))
+(defpackage "MUMBLE-IMPLEMENTATION"
+  (:use #:cl))
 
 (in-package "MUMBLE-IMPLEMENTATION")
 

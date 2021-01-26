@@ -122,7 +122,7 @@
 ;;; Allegro has renamed this stuff as per ANSI CL.
 
 ;#+allegro
-(eval-when (eval compile load)
+(eval-when (:compile-toplevel :load-toplevel :execute)
   (setf (macro-function 'define-setf-method)
 	(macro-function 'define-setf-expander))
   (setf (symbol-function 'get-setf-method)
@@ -239,7 +239,7 @@
 (define-mumble-macro mumble::define-integrable (pattern &rest value)
   (if (consp pattern)
       `(progn
-	 (eval-when (eval compile load)
+	 (eval-when (:compile-toplevel :load-toplevel :execute)
 	   (proclaim '(inline ,(car pattern))))
 	 (defun ,(car pattern) ,(mung-lambda-list (cdr pattern)) ,@value))
       `(defconstant ,pattern ,(car value))))
@@ -249,7 +249,7 @@
   `(defmacro ,(car pattern) ,(mung-lambda-list (cdr pattern)) ,@body))
 
 (define-mumble-macro mumble::define-local-syntax (pattern . body)
-  `(eval-when (eval compile)
+  `(eval-when (:execute :compile-toplevel)
      (defmacro ,(car pattern) ,(mung-lambda-list (cdr pattern)) ,@body)))
 
 
@@ -287,13 +287,13 @@
 ;;; of PROCLAIM.
 
 (define-mumble-macro mumble::predefine (pattern)
-  `(eval-when (eval compile)
+  `(eval-when (:execute :compile-toplevel)
      #+allegro (let ((excl::*compiler-environment* nil))
 		 (do-predefine ',pattern))
      #-allegro (do-predefine ',pattern)
      ))
 
-(eval-when (eval compile load)
+(eval-when (:compile-toplevel :load-toplevel :execute)
   (defun do-predefine (pattern)
     (if (consp pattern)
         (proclaim `(ftype (function ,(mung-decl-lambda-list (cdr pattern)) t)
@@ -335,13 +335,13 @@
 
 #+lucid
 (define-mumble-macro mumble::redefine-syntax (pattern . body)
-  `(eval-when (eval compile load)
+  `(eval-when (:compile-toplevel :load-toplevel :execute)
      (let ((lcl:*redefinition-action*  nil))
        (mumble::define-syntax ,pattern ,@body))))
 
 #+allegro
 (define-mumble-macro mumble::redefine-syntax (pattern . body)
-  `(eval-when (eval compile load)
+  `(eval-when (:compile-toplevel :load-toplevel :execute)
      (let ((excl:*redefinition-warnings*  nil))
        (mumble::define-syntax ,pattern ,@body))))
   

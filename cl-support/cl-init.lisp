@@ -6,7 +6,7 @@
 ;;; All of the files loaded here are assumed to be regular Common Lisp
 ;;; files.
 
-(in-package "MUMBLE-IMPLEMENTATION")
+(cl:in-package "MUMBLE-IMPLEMENTATION")
 
 
 ;;; Turn off bogus warnings and messages!!!
@@ -98,21 +98,7 @@
   (error "Don't know how to initialize *LISP-BINARY-FILE-TYPE*.")
   )
 
-(defvar *lisp-implementation-name*
-  #+lucid "lucid"
-  #+(and allegro next) "allegro-next"
-  #+(and allegro (not next)) "allegro"
-  #+cmu "cmu"
-  #+akcl "akcl"
-  #+mcl "mcl"
-  #+sbcl "sbcl"
-  #+lispworks "lispworks"
-  #+wcl "wcl"
-  #+clisp "clisp"
-  #+ccl "ccl"
-  #-(or sbcl lucid allegro cmu akcl mcl lispworks wcl clisp ccl)
-  (error "Don't know how to initialize *LISP-IMPLEMENTATION-NAME*.")
-  )
+(defvar *lisp-implementation-name* (lisp-implementation-type))
 
 
 
@@ -129,29 +115,22 @@
                        *lisp-implementation-name*
                        "/")))
 
-(defun load-compiled-cl-file (filename)
+(defun load-cl-file (filename)
   (let ((source-file (concatenate 'string
 				  *support-directory*
 				  filename
-				  *lisp-source-file-type*))
-	(binary-file (concatenate 'string
-				  *support-binary-directory*
-				  filename
-				  *lisp-binary-file-type*)))
-    (if (or (not (probe-file binary-file))
-	    (< (file-write-date binary-file) (file-write-date source-file)))
-	(compile-file source-file :output-file (merge-pathnames binary-file)))
-    (load binary-file)))
+				  *lisp-source-file-type*)))
+    (load source-file)))
 
 
 ;;; Do NOT change the load order of these files.
 
-(load-compiled-cl-file "cl-setup")
-(load-compiled-cl-file "cl-support")
-(load-compiled-cl-file "cl-definitions")
-(load-compiled-cl-file "cl-types")
-(load-compiled-cl-file "cl-structs")
-(load-compiled-cl-file "foreign")
+(load-cl-file "cl-setup")
+(load-cl-file "cl-support")
+(load-cl-file "cl-definitions")
+(load-cl-file "cl-types")
+(load-cl-file "cl-structs")
+(load-cl-file "foreign")
 
 
 ;;; It would be nice if at this point we could switch *package*
@@ -161,14 +140,13 @@
 ;;; to use.
 
 (defpackage "MUMBLE-USER"
-  (:use "MUMBLE")
-  (:shadow :type))
+  (:use "MUMBLE"))
 
 
 ;;; Compile and load the rest of the system.  (The Lucid compiler is fast
 ;;; enough to make it practical to compile things all the time.)
 
-(eval-when (eval compile load)
+(eval-when (:compile-toplevel :load-toplevel :execute)
   (setf *package* (find-package "MUMBLE-USER")))
 
 (load "$Y2/support/system")
